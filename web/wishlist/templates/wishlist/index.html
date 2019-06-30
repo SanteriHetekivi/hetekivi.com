@@ -1,11 +1,10 @@
 {% block content %}
     <h2>New Item</h2>
-    <form method="POST" class="post-form">{% csrf_token %}
-        {{ form.as_p }}
+    <form method="POST" class="post-form" action={% if form_id is None %} {% url 'item_save' %} {% else %} {% url 'item_save' form_id %}{% endif %}>{% csrf_token %}
+        {{ form }}
         <button type="submit" class="save btn btn-default">Save</button>
     </form>
 {% endblock %}
-{{ form }}
 {% if wishlist %}
     <ul>
     {% for item in wishlist %}
@@ -22,7 +21,8 @@
                     </a>
                 {% endif %}
             )
-            <a href="/wishlist/{{ item.id }}/delete">DELETE</a>
+            <a href="{% url 'item_edit' item.id %}">EDIT</a>
+            <a href="{% url 'item_delete' item.id %}">DELETE</a>
             </li>
     {% endfor %}
     </ul>
