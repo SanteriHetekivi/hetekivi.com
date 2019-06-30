@@ -1,11 +1,13 @@
 from django.urls import path
 
 from . import views
+from . import models
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('Item/<int:id>/delete', views.item_delete, name='item_delete'),
-    path('Item/<int:id>/edit', views.item_edit, name='item_edit'),
-    path('Item/<int:id>/save', views.item_save, name='item_save'),
-    path('Item/save', views.item_save, name='item_save'),
+    path('<slug:cls>/<int:id>/save', views.save, name='save'),
+    path('<slug:cls>/save', views.save, name='save'),
+    path('<slug:cls>/edit', views.edit, name='edit'),
+    path('<slug:cls>/<int:id>/edit', views.edit, name='edit'),
+    path('<slug:cls>/<int:id>/delete', views.delete, name='delete'),
 ]

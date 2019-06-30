@@ -1,6 +1,7 @@
 from django.db import models
 import positions
 from django.forms.models import modelform_factory
+import sys
 
 # Create your models here.
 
@@ -38,10 +39,20 @@ class Base(models.Model):
         form = cls.form(request, id)
         if form.is_valid():
             form.save()
-            form = cls.form()
-        else:
-            print(form.errors.items)
+            form = None
         return form
+
+    @classmethod
+    def class_name(cls):
+        return cls.__name__
+
+    @classmethod
+    def str_class(cls, classname):
+        o = getattr(sys.modules[__name__], classname)
+        if not issubclass(o, cls):
+            raise Exception(
+                'Class {} is not instance of {}'.format(classname, cls.class_name()))
+        return o
 
 
 class Holder(Base):

@@ -36,24 +36,24 @@
                                     <tr>
                                         <td>{{ item.pos }}</td>
                                         <td>
-                                            <a href="{{ item.image.url }}">
-                                                <img src="{{ item.image.url }}" max-width="500px"/>
+                                            <a href="{{ item.image.url }}" target="_blank">
+                                                <img src="{{ item.image.url }}" style="max-width:200px;"/>
                                             </a>
                                         </td>
                                         <td>{{ item.name }}</td>
                                         <td>{{ item.type.name }}</td>
                                         <td>{{ item.platform.name }}</td>
                                         <td>
-                                            <a href="{{ item.url }}">
+                                            <a href="{{ item.url }}" target="_blank">
                                                 {{ item.store.name }}
                                             </a>
                                         </td>
                                         <td>{{ item.price }}</td>
                                         <td>
-                                            <a href="{% url 'item_edit' item.id %}">
+                                            <a href="{% url 'edit' models.Item.class_name item.id %}">
                                                 <i class="far fa-edit"></i>
                                             </a>
-                                            <a href="{% url 'item_delete' item.id %}">
+                                            <a href="{% url 'delete' models.Item.class_name item.id %}">
                                                <i class="far fa-trash-alt"></i>
                                             </a>
                                         </td>
@@ -65,10 +65,10 @@
                 </div>
                 <div class="form col-md-3">
                     {% block content %}
-                        <form method="POST" class="post-form" enctype="multipart/form-data" action={% if form_id is None %} {% url 'item_save' %} {% else %} {% url 'item_save' form_id %}{% endif %}>
+                        <form method="POST" class="post-form" enctype="multipart/form-data" action={% if form_id is None %} {% url 'save' form_class %} {% else %} {% url 'save' form_class form_id %}{% endif %}>
                             {% csrf_token %}
                             {{ form|crispy }}
-                            <button type="submit" class="btn btn-success">Save</button>
+                            <button type="submit" class="btn btn-success">Save {{ form_class }}</button>
                         </form>
                     {% endblock %}
                 </div>
