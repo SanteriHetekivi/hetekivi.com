@@ -115,4 +115,4 @@ GitHub.sublime-settings
 !.vscode/extensions.json 
 .history
 
-postgres-data
+data

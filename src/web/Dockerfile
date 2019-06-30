@@ -1,6 +1,8 @@
 FROM python:3
 ENV PYTHONUNBUFFERED 1
 RUN mkdir /web
+RUN mkdir /data
 WORKDIR /web
 COPY requirements.txt /web/
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt

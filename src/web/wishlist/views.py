@@ -8,14 +8,15 @@ from django.shortcuts import redirect
 def index(request, form=None, form_id=None):
     if form is None:
         form = Item.form()
-    wishlist = Item.objects.order_by('position')
-    template = loader.get_template('wishlist/index.html')
-    context = {
-        'wishlist': wishlist,
-        'form': form,
-        'form_id': form_id,
-    }
-    return HttpResponse(template.render(context, request))
+    return HttpResponse(
+        loader.get_template('wishlist/index.html').render(
+            {
+                'wishlist': Item.objects.order_by('position'),
+                'form': form,
+                'form_id': form_id,
+            }, request
+        )
+    )
 
 
 def item_save(request, id=None):

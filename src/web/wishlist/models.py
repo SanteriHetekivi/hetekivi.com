@@ -16,13 +16,15 @@ class Base(models.Model):
     def form(cls, request=None, id=None):
         if request is not None and request.method == "POST":
             data = request.POST
+            files = request.FILES
         else:
             data = None
+            files = None
         if id is None:
             instance = None
         else:
             instance = cls.objects.get(id=id)
-        return cls.form_class()(data, instance=instance)
+        return cls.form_class()(data, files, instance=instance)
 
     @classmethod
     def form_class(cls, id=None):
@@ -37,6 +39,8 @@ class Base(models.Model):
         if form.is_valid():
             form.save()
             form = cls.form()
+        else:
+            print(form.errors.items)
         return form
 
 
@@ -78,6 +82,10 @@ class Item(Base):
         'Store',
         on_delete=models.PROTECT,
     )
+    platform = models.ForeignKey(
+        'Platform',
+        on_delete=models.PROTECT,
+    )
     series = models.ForeignKey(
         'Series',
         on_delete=models.PROTECT,
@@ -93,3 +101,7 @@ class Item(Base):
     objects = positions.PositionManager('position')
     url = models.URLField(blank=True)
     price = models.DecimalField(max_digits=6, decimal_places=2)
+    image = models.ImageField(upload_to='item/images/')
+
+    def pos(self):
+        return self.position+1
