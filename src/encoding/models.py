@@ -119,7 +119,6 @@ class Job(Base):
 
     @staticmethod
     def RunEncode():
-        print(datetime.now())
         thread = threading.Thread(target=Job.Encode, args=())
         thread.daemon = True
         thread.start()
