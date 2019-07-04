@@ -6,20 +6,14 @@ services:
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
   web:
-    build: ./src/web
-    command:
-      [
-        "./wait-for-it.sh",
-        "db:5432",
-        "--",
-        "python",
-        "manage.py",
-        "runserver",
-        "0.0.0.0:8000",
-      ]
+    privileged: true
+    build: .
     volumes:
-      - ./src/web:/web
+      - ./src:/app
       - ./data/web:/data
+      - ./data/handbreak:/handbreak
+    environment:
+      TZ: "Europe/Helsinki"
     ports:
       - "8000:8000"
     depends_on:

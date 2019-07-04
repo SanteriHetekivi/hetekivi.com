@@ -112,7 +112,7 @@ class Item(Base):
     objects = positions.PositionManager('position')
     url = models.URLField(blank=True)
     price = models.DecimalField(max_digits=6, decimal_places=2)
-    image = models.ImageField(upload_to='item/images/')
+    image = models.ImageField(upload_to='wishlist/item/images/')
 
     def pos(self):
         return self.position+1
