@@ -25,7 +25,6 @@ RUN apt-get update && \
 # Making directories for code and data.
 RUN mkdir /app
 RUN mkdir /data
-RUN mkdir /handbreak
 
 # Adding code.
 WORKDIR /app

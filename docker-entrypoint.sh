@@ -11,7 +11,6 @@ usermod -o -u "$PUID" app &&
 # Change permission for user and group.
 chown -R app:app /app &&
 chown -R app:app /data &&
-chown -R app:app /handbreak &&
 chown -R app:app /usr/src/app &&
 chmod +x /app/run.sh &&
 
