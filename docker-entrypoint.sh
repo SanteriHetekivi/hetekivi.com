@@ -17,6 +17,12 @@ chmod +x /app/run.sh &&
 su -s /bin/bash -c 'id' app &&
 
 # Wait for database.
-/app/wait-for-it.sh db:5432 &&
+RETRIES=100
+until psql -h db -U postgres -d postgres -c "select 1" > /dev/null 2>&1 || [ $RETRIES -eq 0 ]; do
+  RETRIES=$(( RETRIES-1 ))
+  echo "Waiting for postgres server, $RETRIES remaining attempts..."
+  sleep 1
+done
+
 # Running command.
 exec gosu app "$@"
