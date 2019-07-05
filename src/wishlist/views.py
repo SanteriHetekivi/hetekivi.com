@@ -24,7 +24,7 @@ def index(request, form=None, form_id=None):
 def save(request, cls, id=None):
     form = models.Base.str_class(cls).save_form(request=request, id=id)
     if(form is None):
-        return redirect("index")
+        return redirect("wishlist_index")
     else:
         return index(request, form, id)
 
@@ -35,4 +35,4 @@ def edit(request, cls, id=None):
 
 def delete(request, cls, id):
     models.Base.str_class(cls).objects.filter(id=id).delete()
-    return redirect("index")
+    return redirect("wishlist_index")
