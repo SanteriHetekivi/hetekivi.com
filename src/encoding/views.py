@@ -22,6 +22,7 @@ def index(request, form=None):
     )
 
 
+@csrf_exempt
 def save(request, cls, id=None):
     form = models.Base.str_class(cls).save_form(request=request)
     if(form is None):
