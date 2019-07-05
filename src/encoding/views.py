@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.template import loader
 from . import models
 from django.shortcuts import redirect
+from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 
 
