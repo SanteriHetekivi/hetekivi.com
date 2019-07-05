@@ -132,3 +132,5 @@ MEDIA_ROOT = (
 )
 
 MEDIA_URL = '/data/'
+
+FILE_UPLOAD_TEMP_DIR = "/data/tmp/"

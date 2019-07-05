@@ -13,6 +13,7 @@ RUN ln -s usr/local/bin/docker-entrypoint.sh / # backwards compat
 # Making directories for code and data.
 RUN mkdir /app
 RUN mkdir /data
+RUN mkdir /data/tmp
 
 # Adding code.
 WORKDIR /app
