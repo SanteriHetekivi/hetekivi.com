@@ -133,34 +133,99 @@ class Job(Base):
         waiting[0].encode()
 
     def encode(self):
+        # Already one encoding.
         if(len(Job.objects.filter(status=Job.ENCODING)) > 0):
             return
+        # Input filepath.
         input_path = self.file.path
+        if not os.path.isfile(input_path):
+            raise RuntimeError(
+                'No input file "{}"!.'.format(
+                    input_path
+                )
+            )
+        # Output filepath.
         output_path = input_path+".tmp"
+        if os.path.isfile(output_path):
+            # Remove if exists.
+            os.remove(output_path)
+        # Preset filepath.
+        preset_path = self.type.preset.path
+        if not os.path.isfile(preset_path):
+            raise RuntimeError(
+                'No preset file "{}"!.'.format(
+                    preset_path
+                )
+            )
+        # HandBrake command.
         cmd = "HandBrakeCLI --preset-import-file '{}' -i '{}' -o '{}'".format(
-            self.type.preset.path, input_path, output_path)
+            preset_path, input_path, output_path)
         print(cmd)
+        # Run subprocess with command.
         process = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            shell=True, universal_newlines=True
+            shell=True,
+            universal_newlines=True
         )
         last_line = None
+        return_code = None
         while True:
+            # Get return code.
+            return_code = process.poll()
+            # If return code is given stop running.
+            if return_code is not None:
+                break
+            # Get output line.
             line = process.stdout.readline().strip()
+            print(line)
+            # If line was different than last time.
             if line and line != last_line:
                 last_line = line
+                # Save line and info to database.
                 self.output = (line[:125] + '...') if len(line) > 125 else line
                 self.status = Job.ENCODING
                 self.last_output_time = datetime.now(tz=timezone.utc)
                 self.set_estimate(line)
                 self.save()
-                print(line)
-            if process.poll() is not None:
-                break
-        os.rename(output_path, input_path)
+        # If command failed.
+        if return_code != 0:
+            raise RuntimeError(
+                'Command "{}" returned with code {}.'.format(
+                    cmd, return_code
+                )
+            )
+        # Check output file.
+        if not os.path.isfile(output_path):
+            raise RuntimeError(
+                'No output file "{}"!.'.format(
+                    output_path
+                )
+            )
+        # Check input file
+        if not os.path.isfile(input_path):
+            raise RuntimeError(
+                'No input file "{}"!.'.format(
+                    input_path
+                )
+            )
+        # Replace input file with output file.
+        print(
+            'Replacing input file "{}" with output file "{}".'.format(
+                input_path,
+                output_path
+            )
+        )
+        os.replace(output_path, input_path)
+        # Set status to done.
         self.status = Job.DONE
+        # Emptying fields.
+        self.estimate = None
+        # and save object.
+        print("Saving object...")
+        self.save()
+        # Try to start new encode.
         Job.Encode()
 
     def set_estimate(self, line):
