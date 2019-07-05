@@ -35,3 +35,13 @@ def save(request, cls, id=None):
 def delete(request, cls, id):
     models.Base.str_class(cls).objects.filter(id=id).delete()
     return redirect("encoding_index")
+
+
+def reset(request, id):
+    obj = models.Job.objects.filter(id=id)[0]
+    obj.status = models.Job.WAITING
+    obj.output = ""
+    obj.estimate = None
+    obj.last_output_time = None
+    obj.save()
+    return redirect("encoding_index")

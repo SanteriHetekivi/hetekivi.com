@@ -44,6 +44,9 @@
                                             <a href="{{ item.file.url }}">
                                                 <i class="fas fa-download"></i>
                                             </a>
+                                             <a href="{% url 'reset_job' item.id %}">
+                                                <i class="fas fa-redo"></i>
+                                            </a>
                                             <a href="{% url 'delete_encoding' models.Job.class_name item.id %}">
                                                 <i class="far fa-trash-alt"></i>
                                             </a>
