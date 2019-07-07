@@ -1,72 +1,23 @@
 from django.db import models
 from django.core.validators import FileExtensionValidator
 from django.forms.models import modelform_factory
-import sys
 import subprocess
 import os
 import threading
 import re
 from datetime import datetime, timedelta
 from django.utils import timezone
+from hetekivi.models import Base
 
 # Create your models here.
 
 
-class Base(models.Model):
+class EncodingBase(Base):
     class Meta:
         abstract = True
 
-    def __str__(self):
-        return self.name
 
-    @classmethod
-    def form(cls, request=None, id=None):
-        if request is not None and request.method == "POST":
-            data = request.POST
-            files = request.FILES
-        else:
-            data = None
-            files = None
-        if id is None:
-            instance = None
-        else:
-            instance = cls.objects.get(id=id)
-        return cls.form_class()(data, files, instance=instance)
-
-    @classmethod
-    def form_class(cls, id=None):
-        return modelform_factory(cls, exclude=[])
-
-    @classmethod
-    def save_form(cls, request, id=None):
-        if request.method != "POST":
-            raise Exception(
-                'Method was not POST, it was {}'.format(request.method))
-        form = cls.form(request, id)
-        if form.is_valid():
-            form.save()
-            cls.AfterSave()
-            form = None
-        return form
-
-    @staticmethod
-    def AfterSave():
-        pass
-
-    @classmethod
-    def class_name(cls):
-        return cls.__name__
-
-    @classmethod
-    def str_class(cls, classname):
-        o = getattr(sys.modules[__name__], classname)
-        if not issubclass(o, cls):
-            raise Exception(
-                'Class {} is not instance of {}'.format(classname, cls.class_name()))
-        return o
-
-
-class Type(Base):
+class Type(EncodingBase):
     name = models.CharField(max_length=8)
     preset = models.FileField(
         validators=[
@@ -76,7 +27,7 @@ class Type(Base):
     )
 
 
-class Job(Base):
+class Job(EncodingBase):
     file = models.FileField(
         validators=[
             FileExtensionValidator(['mkv'])
@@ -113,6 +64,13 @@ class Job(Base):
     def status_name(self):
         return Job.STATUSES[self.status][1]
 
+    def remove_file(self, field_name, old_path):
+        super(Job, self).remove_file(field_name, old_path)
+        if(field_name == "file"):
+            tmp_path = Job.make_tmp_path(old_path)
+            if os.path.isfile(tmp_path):
+                os.remove(tmp_path)
+
     @staticmethod
     def AfterSave():
         Job.RunEncode()
@@ -132,6 +90,10 @@ class Job(Base):
             return
         waiting[0].encode()
 
+    @staticmethod
+    def make_tmp_path(path):
+        return path+".tmp"
+
     def encode(self):
         # Already one encoding.
         if(len(Job.objects.filter(status=Job.ENCODING)) > 0):
@@ -145,7 +107,7 @@ class Job(Base):
                 )
             )
         # Output filepath.
-        output_path = input_path+".tmp"
+        output_path = Job.make_tmp_path(input_path)
         if os.path.isfile(output_path):
             # Remove if exists.
             os.remove(output_path)
@@ -160,7 +122,6 @@ class Job(Base):
         # HandBrake command.
         cmd = "HandBrakeCLI --preset-import-file '{}' -i '{}' -o '{}'".format(
             preset_path, input_path, output_path)
-        print(cmd)
         # Run subprocess with command.
         process = subprocess.Popen(
             cmd,
@@ -179,7 +140,6 @@ class Job(Base):
                 break
             # Get output line.
             line = process.stdout.readline().strip()
-            print(line)
             # If line was different than last time.
             if line and line != last_line:
                 last_line = line

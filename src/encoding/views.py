@@ -25,7 +25,7 @@ def index(request, form=None):
 
 @csrf_exempt
 def save(request, cls, id=None):
-    form = models.Base.str_class(cls).save_form(request=request)
+    form = models.EncodingBase.str_class(cls).save_form(request=request)
     if(form is None):
         return redirect("encoding_index")
     else:
@@ -33,7 +33,7 @@ def save(request, cls, id=None):
 
 
 def delete(request, cls, id):
-    models.Base.str_class(cls).objects.filter(id=id).delete()
+    models.EncodingBase.str_class(cls).objects.filter(id=id).delete()
     return redirect("encoding_index")
 
 
