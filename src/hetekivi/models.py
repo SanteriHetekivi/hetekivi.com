@@ -6,6 +6,7 @@ import os
 
 class Base(models.Model):
     isFromBase = True
+    old_file_paths = {}
 
     class Meta:
         abstract = True
