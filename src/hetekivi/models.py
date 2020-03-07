@@ -119,7 +119,7 @@ class Base(models.Model):
             sender {type} -- The model class that was saved.
             instance {Base} -- Instance of the model that was saved.
         """
-        try
+        try:
             for field_name, old_path in instance.old_file_paths.items():
                 try:
                     new_path = instance.attr(field_name).path
