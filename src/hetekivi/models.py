@@ -119,13 +119,16 @@ class Base(models.Model):
             sender {type} -- The model class that was saved.
             instance {Base} -- Instance of the model that was saved.
         """
-        for field_name, old_path in instance.old_file_paths.items():
-            try:
-                new_path = instance.attr(field_name).path
-            except instance.DoesNotExist:
-                new_path = None
-            if not old_path == new_path and os.path.isfile(old_path):
-                instance.remove_file(field_name, old_path)
+        try
+            for field_name, old_path in instance.old_file_paths.items():
+                try:
+                    new_path = instance.attr(field_name).path
+                except instance.DoesNotExist:
+                    new_path = None
+                if not old_path == new_path and os.path.isfile(old_path):
+                    instance.remove_file(field_name, old_path)
+        except AttributeError:
+            pass
 
     def remove_file(self, field_name, old_path):
         os.remove(old_path)
